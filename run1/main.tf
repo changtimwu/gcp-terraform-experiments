@@ -28,15 +28,19 @@ resource "google_cloud_run_v2_service" "public" {
 
   template {
     containers {
-      # TODO<developer>: replace this with a public service container
-      # (This service can be invoked by anyone on the internet)
-      image = "asia-east1-docker.pkg.dev/gen-lang-client-0633195184/cloud-run-source-deploy/call-private"
+      #take the image from another cloud run service 
+      #gcloud run services describe call-private
+      image = "asia-east1-docker.pkg.dev/gen-lang-client-0633195184/cloud-run-source-deploy/call-private:latest"
 
       # Include a reference to the private Cloud Run
       # service's URL as an environment variable.
       env {
         name  = "targetURL"
         value = google_cloud_run_v2_service.private.uri
+      }
+      ports {
+        container_port = 8080
+        name = "http1"
       }
     }
     # Give the "public" Cloud Run service
