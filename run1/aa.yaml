@@ -1,0 +1,75 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/ingress: internal-and-cloud-load-balancing
+    run.googleapis.com/ingress-status: internal-and-cloud-load-balancing
+    run.googleapis.com/operation-id: bc65edde-7def-404f-a285-a2a13ffee045
+    run.googleapis.com/urls: '["https://hello-375621443269.asia-east1.run.app","https://hello-7ahpw2de5a-de.a.run.app"]'
+    runapps.googleapis.com/integrations: router/custom-domains
+    runapps.googleapis.com/integrations.router.custom-domains: '2024-09-06T01:55:08.601244Z'
+    serving.knative.dev/creator: changtimwu@gmail.com
+    serving.knative.dev/lastModifier: changtimwu@gmail.com
+  creationTimestamp: '2024-09-02T23:37:43.223433Z'
+  generation: 3
+  labels:
+    cloud.googleapis.com/location: asia-east1
+  name: hello
+  namespace: '375621443269'
+  resourceVersion: AAYhb9qaXzI
+  selfLink: /apis/serving.knative.dev/v1/namespaces/375621443269/services/hello
+  uid: 06b5658e-2ef4-43d2-81de-50efa5ed41b2
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '100'
+        run.googleapis.com/client-name: cloud-console
+        run.googleapis.com/startup-cpu-boost: 'true'
+      labels:
+        run.googleapis.com/startupProbeType: Default
+    spec:
+      containerConcurrency: 80
+      containers:
+      - image: us-docker.pkg.dev/cloudrun/container/hello
+        name: hello-1
+        ports:
+        - containerPort: 8080
+          name: http1
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 240
+      serviceAccountName: 375621443269-compute@developer.gserviceaccount.com
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
+status:
+  address:
+    url: https://hello-7ahpw2de5a-de.a.run.app
+  conditions:
+  - lastTransitionTime: '2024-09-06T08:55:46.714462Z'
+    status: 'True'
+    type: Ready
+  - lastTransitionTime: '2024-09-02T23:37:43.361594Z'
+    status: 'True'
+    type: ConfigurationsReady
+  - lastTransitionTime: '2024-09-06T08:55:46.683849Z'
+    status: 'True'
+    type: RoutesReady
+  latestCreatedRevisionName: hello-00001-xnw
+  latestReadyRevisionName: hello-00001-xnw
+  observedGeneration: 3
+  traffic:
+  - latestRevision: true
+    percent: 100
+    revisionName: hello-00001-xnw
+  url: https://hello-7ahpw2de5a-de.a.run.app
