@@ -13,8 +13,14 @@
             <input type="text" id="targetUrl" placeholder="Enter target URL" class="w-full p-2 border rounded">
         </div>
         <button onclick="loadUrl()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Load URL</button>
-        <div class="mt-4">
+        <div class="mt-4 relative">
             <iframe id="resultFrame" src="about:blank" class="w-full h-[600px] border rounded"></iframe>
+            <div id="loadingPrompt" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 hidden">
+                <div class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                    <p class="mt-2 text-gray-700">Loading...</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -22,12 +28,23 @@
         function loadUrl() {
             const targetUrl = document.getElementById('targetUrl').value;
             if (targetUrl) {
+                showLoadingPrompt();
                 const forwardUrl = `/forward?target=${encodeURIComponent(targetUrl)}`;
                 document.getElementById('resultFrame').src = forwardUrl;
             } else {
                 alert('Please enter a target URL');
             }
         }
+
+        function showLoadingPrompt() {
+            document.getElementById('loadingPrompt').classList.remove('hidden');
+        }
+
+        function hideLoadingPrompt() {
+            document.getElementById('loadingPrompt').classList.add('hidden');
+        }
+
+        document.getElementById('resultFrame').addEventListener('load', hideLoadingPrompt);
     </script>
 </body>
 </html>
