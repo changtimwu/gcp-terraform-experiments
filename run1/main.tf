@@ -30,12 +30,12 @@ resource "google_cloud_run_v2_service" "public" {
     containers {
       # TODO<developer>: replace this with a public service container
       # (This service can be invoked by anyone on the internet)
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+      image = "asia-east1-docker.pkg.dev/gen-lang-client-0633195184/cloud-run-source-deploy/call-private"
 
       # Include a reference to the private Cloud Run
       # service's URL as an environment variable.
       env {
-        name  = "URL"
+        name  = "targetURL"
         value = google_cloud_run_v2_service.private.uri
       }
     }
@@ -44,6 +44,8 @@ resource "google_cloud_run_v2_service" "public" {
     service_account = google_service_account.default.email
   }
 }
+
+
 # [END cloudrun_service_interservice_public_service]
 
 resource "google_cloud_run_service_iam_policy" "public" {
