@@ -1,7 +1,3 @@
-variable "project" {
-  default = "gen-lang-client-0633195184"
-}
-
-variable "region" {
-  default = "asia-east1"
-}
+variable "project" {}
+variable "region" {}
+variable "public_service_image" {}

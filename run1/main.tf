@@ -28,10 +28,7 @@ resource "google_cloud_run_v2_service" "public" {
 
   template {
     containers {
-      #take the image from another cloud run service 
-      #gcloud run services describe call-private
-      image = "asia-east1-docker.pkg.dev/gen-lang-client-0633195184/cloud-run-source-deploy/call-private:latest"
-
+      image = var.public_service_image
       # Include a reference to the private Cloud Run
       # service's URL as an environment variable.
       env {
