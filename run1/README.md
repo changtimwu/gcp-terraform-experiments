@@ -1,5 +1,13 @@
-## Purpose
-We create a public and private cloud run service to check if the so-called `cloud run to cloud run` communication really works.
+## Goal
+We create a public and private cloud run service to check if the so called `service to service` communication really works.
+
+## References
+* https://cloud.google.com/run/docs/triggering/https-request#service-to-service-private
+<i>
+the calling function must also provide a Google-signed ID token to authenticate. This is a two step process:
+* Create a Google-signed ID token with the audience field (aud) set to the URL of the receiving function.
+* Include the ID token in an Authorization: Bearer ID_TOKEN header in the request to the function.
+</i>
 
 ## Prepare the images 
 * build the public service image with cloud build
@@ -68,4 +76,10 @@ bindings:
   role: roles/run.invoker
 etag: BwYjKZFxvpU=
 version: 1
+```
+
+## Test the private service from local
+use the gcloud generated token
+```sh
+./curl_private_service.sh
 ```
