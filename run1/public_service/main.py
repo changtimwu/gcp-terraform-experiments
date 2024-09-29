@@ -57,5 +57,7 @@ async def forward_request(target: str = None, token: str = None):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    portno = os.environ.get('PORT', 8080)
+    uvicorn.run(app, host="0.0.0.0", port=int(portno))
 

@@ -11,5 +11,4 @@ COPY main.py $APP_HOME
 COPY static $APP_HOME/static
 
 EXPOSE 8080
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-
+CMD ["python", "main.py"]
