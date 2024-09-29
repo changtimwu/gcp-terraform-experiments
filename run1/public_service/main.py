@@ -9,8 +9,8 @@ from google.auth import compute_engine
 import google.auth.transport.requests
 import urllib
 import google.oauth2.id_token
-
-
+from google.oauth2 import service_account
+import requests
 
 def make_request_with_credential(url: str):
     """
@@ -34,12 +34,10 @@ def make_request_with_credential(url: str):
     # Get the ID token.
     # Once you've obtained the ID token, use it to make an authenticated call
     # to the target audience.
-    print("request before:", request)
+    print("credentials before :", credentials)
     credentials.refresh(request)
-    # print(credentials.token)
-    print("request after ID token update:", request)
+    print('credentials has token: ', credentials.token)
     return request
-
 
 def make_authorized_get_request(endpoint, audience):
     """
@@ -57,6 +55,37 @@ def make_authorized_get_request(endpoint, audience):
     req.add_header("Authorization", f"Bearer {id_token}")
     response = urllib.request.urlopen(req)
     return response.read()
+
+
+
+def idtoken_from_metadata_server(url: str):
+    """
+    Use the Google Cloud metadata server in the Cloud Run (or AppEngine or Kubernetes etc.,)
+    environment to create an identity token and add it to the HTTP request as part of an
+    Authorization header.
+
+    Args:
+        url: The url or target audience to obtain the ID token for.
+            Examples: http://www.example.com
+    """
+    request = google.auth.transport.requests.Request()
+    # Set the target audience.
+    # Setting "use_metadata_identity_endpoint" to "True" will make the request use the default application
+    # credentials. Optionally, you can also specify a specific service account to use by mentioning
+    # the service_account_email.
+    credentials = compute_engine.IDTokenCredentials(
+        request=request, target_audience=url, use_metadata_identity_endpoint=True
+    )
+    credentials.refresh(request)
+    return credentials.token
+
+def idtoken_from_service_account( url: str):
+    credentials = service_account.IDTokenCredentials.from_service_account_file(
+        filename='sakey.json',
+        target_audience=url)
+    request = google.auth.transport.requests.Request()
+    credentials.refresh(request)
+    return credentials.token
 
 #https://cloud.google.com/docs/authentication/get-id-token#metadata-server
 def idtoken_from_metadata_server_simple(url: str):
@@ -87,14 +116,24 @@ async def get_token( target: str = None):
     return idtoken_from_metadata_server( target)
 
 @app.get("/forward")
-async def forward_request(target: str = None):
+async def forward_request(target: str = None, token: str = None):
     if not target:
         raise HTTPException(status_code=400, detail="Target URL is required")
+    if not token or token=="":
+        #token = idtoken_from_service_account( target)
+        token = idtoken_from_metadata_server( target)
+        #token = idtoken_from_metadata_server_simple( target)
+    # Forward the request to the target URL
     async with httpx.AsyncClient() as client:
         try:
-            response = make_request_with_credential( target)
+            headers = {
+                "Authorization": f"Bearer {token}"
+            }
+            print('headers=', headers)
+            response = await client.get(target, headers=headers)
         except httpx.RequestError as exc:
             raise HTTPException(status_code=500, detail=f"Error forwarding request: {str(exc)}")
+
     # Return the response from the target URL
     return StreamingResponse(
         response.iter_bytes(),
@@ -102,7 +141,16 @@ async def forward_request(target: str = None):
         headers=dict(response.headers)
     )
 
-async def forward_request(target: str = None, token: str = None):
+
+def forward_request2(target: str = None):
+    if not target:
+        raise HTTPException(status_code=400, detail="Target URL is required")
+    req = make_request_with_credential( target)
+    req.get(target)
+    return response.text
+
+
+async def forward_request1(target: str = None, token: str = None):
     if not target:
         raise HTTPException(status_code=400, detail="Target URL is required")
     if not token or token=="":
