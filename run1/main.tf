@@ -29,12 +29,6 @@ resource "google_cloud_run_v2_service" "public" {
   template {
     containers {
       image = var.public_service_image
-      # Include a reference to the private Cloud Run
-      # service's URL as an environment variable.
-      env {
-        name  = "targetURL"
-        value = google_cloud_run_v2_service.private.uri
-      }
       ports {
         container_port = 8080
         name = "http1"
