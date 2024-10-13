@@ -77,6 +77,10 @@ bindings:
 etag: BwYjKZFxvpU=
 version: 1
 ```
+## Explain
+
+* the cloud run service `public-service`'s service account is `cloud-run-interservice-id`
+* the cloud run service `private-service` has a policy -- only resources belong to the service account `cloud-run-interservice-id` can invoke it
 
 ## Test the private service from local
 use the gcloud generated token
