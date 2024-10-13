@@ -83,3 +83,83 @@ use the gcloud generated token
 ```sh
 ./curl_private_service.sh
 ```
+
+
+### example session
+```
+% terraform state list
+data.google_iam_policy.private
+data.google_iam_policy.public
+google_cloud_run_service_iam_policy.private
+google_cloud_run_service_iam_policy.public
+google_cloud_run_v2_service.private
+google_cloud_run_v2_service.public
+google_service_account.default
+
+% terraform state show google_service_account.default
+# google_service_account.default:
+resource "google_service_account" "default" {
+    account_id   = "cloud-run-interservice-id"
+    description  = "Identity used by a public Cloud Run service to call private Cloud Run services."
+    disabled     = false
+    display_name = "cloud-run-interservice-id"
+    email        = "cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com"
+    id           = "projects/gen-lang-client-0633195184/serviceAccounts/cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com"
+    member       = "serviceAccount:cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com"
+    name         = "projects/gen-lang-client-0633195184/serviceAccounts/cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com"
+    project      = "gen-lang-client-0633195184"
+    unique_id    = "103887655456869333678"
+}
+```
+
+```
+% terraform state show data.google_iam_policy.private
+# data.google_iam_policy.private:
+data "google_iam_policy" "private" {
+    id          = "1319431271"
+    policy_data = jsonencode(
+        {
+            bindings = [
+                {
+                    members = [
+                        "serviceAccount:cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com",
+                    ]
+                    role    = "roles/run.invoker"
+                },
+            ]
+        }
+    )
+
+    binding {
+        members = [
+            "serviceAccount:cloud-run-interservice-id@gen-lang-client-0633195184.iam.gserviceaccount.com",
+        ]
+        role    = "roles/run.invoker"
+    }
+}
+
+% terraform state show data.google_iam_policy.public
+# data.google_iam_policy.public:
+data "google_iam_policy" "public" {
+    id          = "3450855414"
+    policy_data = jsonencode(
+        {
+            bindings = [
+                {
+                    members = [
+                        "allUsers",
+                    ]
+                    role    = "roles/run.invoker"
+                },
+            ]
+        }
+    )
+
+    binding {
+        members = [
+            "allUsers",
+        ]
+        role    = "roles/run.invoker"
+    }
+}
+```
